@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
@@ -18,7 +19,11 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.HashMap;
 
@@ -26,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     Button LoginButtn,registerBtn,teacherLoginButton,adminLoginButtn,registerConfirmBtn,getPasswordButtn;
+
 
     EditText userName,Password;
     EditText forgetUserName,forgetSecreteCode;
@@ -134,7 +140,7 @@ public class MainActivity extends AppCompatActivity {
         registerSection = view.findViewById(R.id.sectionET);
         registerMobileNo = view.findViewById(R.id.mobieNoET);
         registerPassword = view.findViewById(R.id.regPasswordET);
-        registerBtn = view.findViewById(R.id.registerButtn);
+        registerConfirmBtn = view.findViewById(R.id.registerButtn);
 
 
 
@@ -252,10 +258,16 @@ public class MainActivity extends AppCompatActivity {
         adminLoginButtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                String loginUserName = userName.getText().toString();
+                String loginUserPassword = Password.getText().toString();
 
-                Intent intent = new Intent(MainActivity.this,AdminActivity.class);
-                startActivity(intent);
-                Toast.makeText(MainActivity.this, "ADMIN", Toast.LENGTH_SHORT).show();
+
+                if (loginUserName.equals("Admin") && loginUserPassword.equals("admin")){
+
+                    Intent intent = new Intent(MainActivity.this,AdminActivity.class);
+                    startActivity(intent);
+                }
+
             }
         });
 
@@ -263,9 +275,43 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                Intent intent = new Intent(MainActivity.this,ClassListActivity.class);
-                startActivity(intent);
-                Toast.makeText(MainActivity.this, "TECAHER", Toast.LENGTH_SHORT).show();
+                String loginUserName = userName.getText().toString();
+                String loginUserPassword = Password.getText().toString();
+
+                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("User");
+
+                databaseReference.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                        for(DataSnapshot dataSnapshot1:dataSnapshot.getChildren()){
+
+                            String name = String.valueOf(dataSnapshot1.child("Name").getValue());
+                            String password = String.valueOf(dataSnapshot1.child("Password").getValue());
+
+                            if (name.equals(loginUserName) && password.equals(loginUserPassword)){
+
+                                Intent intent = new Intent(MainActivity.this,ClassListActivity.class);
+                                startActivity(intent);
+
+                            }
+
+
+                        }
+
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                        Toast.makeText(MainActivity.this, "You are not Registered. Please Register First", Toast.LENGTH_SHORT).show();
+
+                    }
+                });
+
+
+
+
             }
         });
 
