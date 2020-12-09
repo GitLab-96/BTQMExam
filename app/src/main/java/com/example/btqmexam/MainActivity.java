@@ -46,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
         LoginButtn =findViewById(R.id.admin_login_id_Bttn);
         registerBtn  = findViewById(R.id.register_id_Bttn);
         forgetPasswrdTV = findViewById(R.id.forgateid_Bttn);
+
         forgetPasswrdTV.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -125,7 +126,6 @@ public class MainActivity extends AppCompatActivity {
 
             alert = new AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert);
 
-
         }else {
 
             alert = new AlertDialog.Builder(this);
@@ -147,7 +147,7 @@ public class MainActivity extends AppCompatActivity {
         alert.setView(view);
         alert.setCancelable(true);
 
-        registerBtn.setOnClickListener(new View.OnClickListener() {
+        registerConfirmBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
@@ -258,15 +258,85 @@ public class MainActivity extends AppCompatActivity {
         adminLoginButtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String loginUserName = userName.getText().toString();
-                String loginUserPassword = Password.getText().toString();
+
+                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("AdminPassword");
+                databaseReference.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                        String currentPassword = String.valueOf(dataSnapshot.child("CurrentPassword").getValue());
+                        String currentName = String.valueOf(dataSnapshot.child("CurrentName").getValue());
+                        String loginUserName = userName.getText().toString();
+                        String loginUserPassword = Password.getText().toString();
+
+                        if (currentName.length()>0 && currentPassword.length()>0){
+
+                            if (currentName.equals(loginUserName) && currentPassword.equals(loginUserPassword)){
+
+                                Intent intent = new Intent(MainActivity.this,AdminActivity.class);
+                                startActivity(intent);
+                                Toast.makeText(MainActivity.this, ""+currentPassword, Toast.LENGTH_SHORT).show();
+
+                            }
 
 
-                if (loginUserName.equals("Admin") && loginUserPassword.equals("admin")){
+                        }else {
+                            if (loginUserName.equals("Admin") && loginUserPassword.equals("admin")){
 
-                    Intent intent = new Intent(MainActivity.this,AdminActivity.class);
-                    startActivity(intent);
-                }
+                                Intent intent = new Intent(MainActivity.this,AdminActivity.class);
+                                startActivity(intent);
+                            }
+                            else {
+                                Toast.makeText(MainActivity.this, "Please Input Default name and password", Toast.LENGTH_SHORT).show();
+                            }
+
+                        }
+
+
+
+//                        if (!currentPassword.equals(null) && currentName.equals(null)){
+//
+//                            if (loginUserName.equals(currentName) && loginUserPassword.equals(currentPassword)){
+//                                Toast.makeText(MainActivity.this, "Same", Toast.LENGTH_SHORT).show();
+//
+//                            }
+//
+//
+//                        }else {
+//
+
+//                        }
+
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                        Toast.makeText(MainActivity.this, "You are not Registered. Please Register First", Toast.LENGTH_SHORT).show();
+
+                    }
+                });
+
+
+//                if (loginUserName.equals("Admin") && loginUserPassword.equals("admin")){
+//
+//                    Intent intent = new Intent(MainActivity.this,AdminActivity.class);
+//                    startActivity(intent);
+//                }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
             }
         });

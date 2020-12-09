@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+
+
+    <item
+        android:id="@+id/settings_admin"
+        android:title="Setting"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/nitice_admin"
+        android:title="Notice"/>
+    <item
+        android:id="@+id/routin_admin"
+        android:title="Routin"/>
+    <item
+        android:id="@+id/logout_admin"
+        android:title="Logout"
+        />
+
+</menu>
