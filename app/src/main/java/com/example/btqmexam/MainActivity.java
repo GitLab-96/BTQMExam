@@ -259,17 +259,20 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
+
+                String loginUserName = userName.getText().toString();
+                String loginUserPassword = Password.getText().toString();
                 DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("AdminPassword");
-                databaseReference.addValueEventListener(new ValueEventListener() {
+
+
+                databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
 
-                        String currentPassword = String.valueOf(dataSnapshot.child("CurrentPassword").getValue());
-                        String currentName = String.valueOf(dataSnapshot.child("CurrentName").getValue());
-                        String loginUserName = userName.getText().toString();
-                        String loginUserPassword = Password.getText().toString();
 
-                        if (currentName.length()>0 && currentPassword.length()>0){
+                        if (snapshot.exists()){
+                            String currentPassword = String.valueOf(snapshot.child("CurrentPassword").getValue());
+                            String currentName = String.valueOf(snapshot.child("CurrentName").getValue());
 
                             if (currentName.equals(loginUserName) && currentPassword.equals(loginUserPassword)){
 
@@ -277,10 +280,15 @@ public class MainActivity extends AppCompatActivity {
                                 startActivity(intent);
                                 Toast.makeText(MainActivity.this, ""+currentPassword, Toast.LENGTH_SHORT).show();
 
+                            }else {
+                                Toast.makeText(MainActivity.this, "Wrong Password", Toast.LENGTH_SHORT).show();
                             }
 
+                          
 
-                        }else {
+                        }
+                        else {
+
                             if (loginUserName.equals("Admin") && loginUserPassword.equals("admin")){
 
                                 Intent intent = new Intent(MainActivity.this,AdminActivity.class);
@@ -291,51 +299,13 @@ public class MainActivity extends AppCompatActivity {
                             }
 
                         }
-
-
-
-//                        if (!currentPassword.equals(null) && currentName.equals(null)){
-//
-//                            if (loginUserName.equals(currentName) && loginUserPassword.equals(currentPassword)){
-//                                Toast.makeText(MainActivity.this, "Same", Toast.LENGTH_SHORT).show();
-//
-//                            }
-//
-//
-//                        }else {
-//
-
-//                        }
-
                     }
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
-
-                        Toast.makeText(MainActivity.this, "You are not Registered. Please Register First", Toast.LENGTH_SHORT).show();
-
+                        Toast.makeText(MainActivity.this, "You are not Registered. Please Register First"+error, Toast.LENGTH_SHORT).show();
                     }
                 });
-
-
-//                if (loginUserName.equals("Admin") && loginUserPassword.equals("admin")){
-//
-//                    Intent intent = new Intent(MainActivity.this,AdminActivity.class);
-//                    startActivity(intent);
-//                }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
             }
