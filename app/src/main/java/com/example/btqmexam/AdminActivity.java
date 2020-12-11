@@ -4,6 +4,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Build;
 import android.os.Bundle;
@@ -18,6 +20,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
@@ -31,25 +34,51 @@ public class AdminActivity extends AppCompatActivity {
     EditText newPasswordET,re_typeNewPasswordET,newNameET;
     Button setAdminPaswordButtn;
 
+    RecyclerView recyclerViewAdmin;
+    AdminRecyclerViewAdapter adapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin);
 
         Toolbar Admintoolbar = findViewById(R.id.myToolbarAdmin);
-
         setSupportActionBar(Admintoolbar);
 
 
         backIV_admin = findViewById(R.id.backIV_admin);
+        recyclerViewAdmin = findViewById(R.id.adminRecyclerView);
+        recyclerViewAdmin.setLayoutManager(new LinearLayoutManager(this));
+
+
+        FirebaseRecyclerOptions<modelAdmin> options = new FirebaseRecyclerOptions.Builder<modelAdmin>()
+                .setQuery(FirebaseDatabase.getInstance().getReference().child("User"),modelAdmin.class).build();
+
+        adapter = new AdminRecyclerViewAdapter(options);
+        recyclerViewAdmin.setAdapter(adapter);
 
         backIV_admin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+
                 Toast.makeText(AdminActivity.this, "Back Admin", Toast.LENGTH_SHORT).show();
             }
         });
     }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        adapter.startListening();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        adapter.stopListening();
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 
